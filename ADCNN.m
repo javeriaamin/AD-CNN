@@ -1,5 +1,4 @@
 # =========================================================
-# REVIEWER-READY ADNI CLASSIFICATION PIPELINE
 # CNN + Atom Search Optimization (ASO)
 # Addresses ALL reviewer concerns:
 #   R1: Data leakage proof + strict subject-wise splits
@@ -52,8 +51,8 @@ except Exception:
 # =========================================================
 # PATHS
 # =========================================================
-DATASET_SOURCE_PATH = "/kaggle/input/datasets/afiyaamdadrami/adni-augmented-dataset/augmented_balanced_ADNI_v3"
-WORK_DIR      = "/kaggle/working/ADNI_Reviewer_Ready_v2"
+DATASET_SOURCE_PATH = ""
+WORK_DIR      = ""
 RESULTS_DIR   = os.path.join(WORK_DIR, "results")
 CV_DIR        = os.path.join(RESULTS_DIR, "subjectwise_5fold_cv")
 ABLATION_DIR  = os.path.join(RESULTS_DIR, "ablation_study")
@@ -64,7 +63,7 @@ TEXT_DIR      = os.path.join(RESULTS_DIR, "paper_ready_text")
 # =========================================================
 # MAIN SETTINGS
 # =========================================================
-SPLIT_MODE = "subjectwise_auto"   # REVIEWER R1: strict subject-wise, no leakage
+SPLIT_MODE = "subjectwise_auto"   #  strict subject-wise, no leakage
 MODEL_NAME = "efficientnet_b0"
 USE_PRETRAINED   = True
 IMAGE_SIZE       = 224
@@ -527,13 +526,13 @@ def compute_metric_pack(y_true, y_pred, y_prob, num_classes):
     pw, rw, f1w, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted", zero_division=0)
     metrics = {
         "accuracy":           float(accuracy_score(y_true, y_pred)),
-        "balanced_accuracy":  float(balanced_accuracy_score(y_true, y_pred)),   # R7
-        "mcc":                float(matthews_corrcoef(y_true, y_pred)),          # R7
-        "cohen_kappa":        float(cohen_kappa_score(y_true, y_pred)),          # R7
+        "balanced_accuracy":  float(balanced_accuracy_score(y_true, y_pred)),   # 
+        "mcc":                float(matthews_corrcoef(y_true, y_pred)),          # 
+        "cohen_kappa":        float(cohen_kappa_score(y_true, y_pred)),          # 
         "precision_macro":    float(pm), "recall_macro":    float(rm), "f1_macro":    float(f1m),
         "precision_weighted": float(pw), "recall_weighted": float(rw), "f1_weighted": float(f1w),
-        "brier_score": float(multiclass_brier(y_true, y_prob, num_classes)),     # R7
-        "ece":         float(expected_calibration_error(y_true, y_prob)),        # R7
+        "brier_score": float(multiclass_brier(y_true, y_prob, num_classes)),     # 
+        "ece":         float(expected_calibration_error(y_true, y_prob)),        # 
     }
     try:    metrics["log_loss"] = float(log_loss(y_true, y_prob, labels=list(range(num_classes))))
     except: metrics["log_loss"] = None
@@ -1199,7 +1198,7 @@ def main():
         freeze_epochs=FREEZE_BACKBONE_EPOCHS if is_rgb else 0)
 
     # =========================================================
-    # STEP 4 – HOLD-OUT EVALUATION  (R7, R8)
+    # STEP 4 – HOLD-OUT EVALUATION  
     # =========================================================
     print("\n[4] Hold-out evaluation...")
     holdout_result = evaluate_and_save(
@@ -1207,7 +1206,7 @@ def main():
         tag="holdout", use_tta=USE_TTA, is_rgb=is_rgb)
 
     # =========================================================
-    # STEP 5 – FEATURE EXTRACTION + t-SNE/UMAP  (R3)
+    # STEP 5 – FEATURE EXTRACTION + t-SNE/UMAP  
     # =========================================================
     print("\n[5] Feature extraction and t-SNE/UMAP...")
     def make_loader(samps): return DataLoader(
@@ -1297,7 +1296,7 @@ def main():
     err_df.to_csv(os.path.join(aso_dir, "aso_error_analysis.csv"), index=False)
 
     # =========================================================
-    # STEP 7 – FEATURE SELECTION COMPARISON  (R5)
+    # STEP 7 – FEATURE SELECTION COMPARISON  
     # =========================================================
     fs_results = []
     if RUN_FEATURE_SELECTION_COMPARISON:
@@ -1325,7 +1324,7 @@ def main():
             save_fs_comparison_plot(fs_results, os.path.join(FS_COMP_DIR, "fs_comparison.png"))
 
     # =========================================================
-    # STEP 8 – BASELINE MODEL COMPARISON  (R6)
+    # STEP 8 – BASELINE MODEL COMPARISON  
     # =========================================================
     baseline_results = {}
     if RUN_BASELINE_MODEL_COMPARISON:
@@ -1335,7 +1334,7 @@ def main():
             num_classes, device, BASELINE_COMP)
 
     # =========================================================
-    # STEP 9 – ABLATION STUDY  (R4)
+    # STEP 9 – ABLATION STUDY  
     # =========================================================
     ablation_df = None
     if RUN_ABLATION_STUDY:
@@ -1345,7 +1344,7 @@ def main():
             num_classes, device, ABLATION_DIR)
 
     # =========================================================
-    # STEP 10 – 5-FOLD SUBJECT-WISE CV  (R2)
+    # STEP 10 – 5-FOLD SUBJECT-WISE CV  
     # =========================================================
     cv_summary = None
     cv_all_metrics = []
